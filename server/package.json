@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "seed": "node seedDatabase.js",
+    "db:manage": "node dbManagement.js",
+    "db:stats": "node -e \"require('./dbManagement').showStats().then(() => process.exit(0))\""
   },
   "dependencies": {
     "express": "^4.18.2",

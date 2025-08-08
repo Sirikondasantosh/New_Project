@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-export const api = axios.create({
-  baseURL: API_BASE_URL,
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +12,7 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,102 +25,118 @@ api.interceptors.request.use(
 
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-// API endpoints
-export const authAPI = {
-  login: (email: string, password: string) =>
-    api.post('/auth/login', { email, password }),
-  register: (name: string, email: string, password: string) =>
-    api.post('/auth/register', { name, email, password }),
+// Auth API
+const authAPI = {
+  register: (data: any) => api.post('/auth/register', data),
+  login: (data: any) => api.post('/auth/login', data),
   logout: () => api.post('/auth/logout'),
   getProfile: () => api.get('/auth/profile'),
   updateProfile: (data: any) => api.put('/auth/profile', data),
-  changePassword: (currentPassword: string, newPassword: string) =>
-    api.put('/auth/change-password', { currentPassword, newPassword }),
-  verify: () => api.get('/auth/verify'),
+  changePassword: (data: any) => api.put('/auth/change-password', data),
+  forgotPassword: (data: any) => api.post('/auth/forgot-password', data),
+  resetPassword: (data: any) => api.post('/auth/reset-password', data),
+  verifyToken: () => api.get('/auth/verify'),
 };
 
-export const jobsAPI = {
-  getJobs: (params: any) => api.get('/jobs', { params }),
+// Jobs API
+const jobsAPI = {
+  getJobs: (params?: string) => api.get(`/jobs${params ? `?${params}` : ''}`),
   getJob: (id: string) => api.get(`/jobs/${id}`),
   searchJobs: (data: any) => api.post('/jobs/search', data),
-  getStats: () => api.get('/jobs/stats/overview'),
+  getJobStats: () => api.get('/jobs/stats/overview'),
   scrapeJobs: (data: any) => api.post('/jobs/scrape', data),
 };
 
-export const applicationsAPI = {
-  apply: (jobId: string, data: any) => api.post('/applications/apply', { jobId, ...data }),
-  getMyApplications: (params: any) => api.get('/applications/my-applications', { params }),
+// Applications API
+const applicationsAPI = {
+  apply: (data: any) => api.post('/applications/apply', data),
+  getMyApplications: (params?: string) => api.get(`/applications/my-applications${params ? `?${params}` : ''}`),
   getApplication: (id: string) => api.get(`/applications/${id}`),
-  updateStatus: (id: string, status: string, notes?: string) =>
-    api.put(`/applications/${id}/status`, { status, notes }),
-  addInterview: (id: string, data: any) =>
-    api.put(`/applications/${id}/interview`, data),
-  addFollowUp: (id: string, date: string) =>
-    api.put(`/applications/${id}/follow-up`, { date }),
-  updateSalary: (id: string, data: any) =>
-    api.put(`/applications/${id}/salary`, data),
+  updateStatus: (id: string, data: any) => api.put(`/applications/${id}/status`, data),
+  updateApplication: (id: string, data: any) => api.put(`/applications/${id}`, data),
+  addInterview: (id: string, data: any) => api.put(`/applications/${id}/interview`, data),
+  addFollowUp: (id: string, data: any) => api.put(`/applications/${id}/follow-up`, data),
+  updateSalary: (id: string, data: any) => api.put(`/applications/${id}/salary`, data),
   deleteApplication: (id: string) => api.delete(`/applications/${id}`),
   getStats: () => api.get('/applications/stats/overview'),
   getPendingFollowUps: () => api.get('/applications/follow-ups/pending'),
-  bulkUpdateStatus: (applicationIds: string[], status: string) =>
-    api.put('/applications/bulk/status', { applicationIds, status }),
+  bulkUpdateStatus: (data: any) => api.put('/applications/bulk/status', data),
 };
 
-export const resumeAPI = {
-  upload: (file: File) => {
-    const formData = new FormData();
-    formData.append('resume', file);
-    return api.post('/resume/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
+// Resume API
+const resumeAPI = {
+  upload: (formData: FormData) => api.post('/resume/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
   getCurrent: () => api.get('/resume/current'),
   download: () => api.get('/resume/download', { responseType: 'blob' }),
   analyze: (jobId: string) => api.post(`/resume/analyze/${jobId}`),
-  batchAnalyze: (jobIds: string[]) => api.post('/resume/batch-analyze', { jobIds }),
+  batchAnalyze: () => api.post('/resume/batch-analyze'),
   updateParsedData: (data: any) => api.put('/resume/update-parsed-data', data),
   delete: () => api.delete('/resume/delete'),
   getStats: () => api.get('/resume/stats'),
 };
 
-export const subscriptionAPI = {
+// Subscription API
+const subscriptionAPI = {
   getPlans: () => api.get('/subscription/plans'),
   getCurrent: () => api.get('/subscription/current'),
-  createCheckoutSession: (planType: string) =>
-    api.post('/subscription/create-checkout-session', { planType }),
-  handleSuccess: (sessionId: string) =>
-    api.post('/subscription/success', { sessionId }),
+  createCheckoutSession: (data: any) => api.post('/subscription/create-checkout-session', data),
+  success: (data: any) => api.post('/subscription/success', data),
   cancel: () => api.post('/subscription/cancel'),
   reactivate: () => api.post('/subscription/reactivate'),
   getUsage: () => api.get('/subscription/usage'),
   getBillingHistory: () => api.get('/subscription/billing-history'),
 };
 
-export const adminAPI = {
+// Admin API
+const adminAPI = {
   getDashboardStats: () => api.get('/admin/dashboard/stats'),
-  getUsers: (params: any) => api.get('/admin/users', { params }),
+  getRecentActivity: () => api.get('/admin/recent-activity'),
+  
+  // Users management
+  getUsers: (params?: string) => api.get(`/admin/users${params ? `?${params}` : ''}`),
   getUser: (id: string) => api.get(`/admin/users/${id}`),
   updateUser: (id: string, data: any) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
-  getJobs: (params: any) => api.get('/admin/jobs', { params }),
+  
+  // Jobs management
+  getJobs: (params?: string) => api.get(`/admin/jobs${params ? `?${params}` : ''}`),
   scrapeJobs: (data: any) => api.post('/admin/jobs/scrape', data),
   toggleJobActive: (id: string) => api.put(`/admin/jobs/${id}/toggle-active`),
   deleteJob: (id: string) => api.delete(`/admin/jobs/${id}`),
-  getAnalytics: () => api.get('/admin/analytics'),
-  getLogs: (params: any) => api.get('/admin/logs', { params }),
+  
+  // Analytics
+  getAnalytics: (params?: string) => api.get(`/admin/analytics${params ? `?${params}` : ''}`),
+  getLogs: (params?: string) => api.get(`/admin/logs${params ? `?${params}` : ''}`),
+  
+  // System maintenance
   cleanupOldJobs: () => api.post('/admin/maintenance/cleanup-old-jobs'),
 };
 
-export default api;
+// Export the API object with proper structure for components
+export const apiService = {
+  auth: authAPI,
+  jobs: jobsAPI,
+  applications: applicationsAPI,
+  resume: resumeAPI,
+  subscription: subscriptionAPI,
+  admin: adminAPI,
+};
+
+// Export default as the main API instance
+export default apiService;
+
+// Named export for convenience
+export { apiService as api };

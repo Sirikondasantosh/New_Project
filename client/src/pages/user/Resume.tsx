@@ -250,14 +250,14 @@ export default function Resume() {
         skills: resume.parsedData.skills || [],
         experience: resume.parsedData.experience || [],
         education: resume.parsedData.education || [],
-        contact: resume.parsedData.contact || {
-          name: '',
-          email: '',
-          phone: '',
-          location: '',
-          linkedin: '',
-          github: '',
-          website: ''
+        contact: {
+          name: resume.parsedData.contact?.name || '',
+          email: resume.parsedData.contact?.email || '',
+          phone: resume.parsedData.contact?.phone || '',
+          location: resume.parsedData.contact?.location || '',
+          linkedin: resume.parsedData.contact?.linkedin || '',
+          github: resume.parsedData.contact?.github || '',
+          website: resume.parsedData.contact?.website || ''
         },
         summary: resume.parsedData.summary || '',
         projects: resume.parsedData.projects || []

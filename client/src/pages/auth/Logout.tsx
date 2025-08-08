@@ -10,7 +10,11 @@ export default function Logout() {
 
   useEffect(() => {
     logout();
-    addToast('You have been logged out successfully', 'info');
+    addToast({
+      type: 'info',
+      title: 'Logged Out',
+      message: 'You have been logged out successfully'
+    });
     navigate('/');
   }, [logout, addToast, navigate]);
 

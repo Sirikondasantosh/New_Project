@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -16,6 +16,10 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
+interface AdminLayoutProps {
+  children: React.ReactNode;
+}
+
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
@@ -24,7 +28,7 @@ const navigation = [
   { name: 'Settings', href: '/admin/settings', icon: CogIcon },
 ];
 
-export default function AdminLayout() {
+export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const location = useLocation();
@@ -267,7 +271,7 @@ export default function AdminLayout() {
 
         {/* Page content */}
         <main className="p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          {children}
         </main>
       </div>
 

@@ -71,11 +71,12 @@ export default function Register() {
     setLoading(true);
     
     try {
-      await register({
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password
-      });
+      await register(
+        formData.name.trim(),
+        formData.email.trim().toLowerCase(),
+        formData.password,
+        formData.confirmPassword
+      );
       
       addToast({
         type: 'success',

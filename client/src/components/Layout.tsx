@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -16,6 +16,10 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
@@ -25,7 +29,7 @@ const navigation = [
   { name: 'Subscription', href: '/subscription', icon: CreditCardIcon },
 ];
 
-export default function Layout() {
+export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const location = useLocation();
@@ -212,7 +216,7 @@ export default function Layout() {
 
         {/* Page content */}
         <main className="p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          {children}
         </main>
       </div>
 

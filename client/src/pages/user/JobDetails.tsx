@@ -114,7 +114,7 @@ export default function JobDetails() {
     if (!job || !id) return;
 
     // Check if user has reached daily limit
-    if (user?.subscription?.plan === 'free' && user?.applicationStats?.dailyApplications?.[0]?.count >= 5) {
+    if (user?.subscription?.plan === 'free' && (user?.stats?.todayApplications || 0) >= 5) {
       addToast({
         type: 'warning',
         title: 'Daily Limit Reached',

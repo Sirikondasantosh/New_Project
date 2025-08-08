@@ -1,33 +1,47 @@
-import React, { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children: React.ReactNode;
   requireAdmin?: boolean;
+  requireAuth?: boolean;
 }
 
-export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requireAdmin = false, 
+  requireAuth = true 
+}) => {
+  const { user, loading, isAuthenticated, isAdmin } = useAuth();
+  const location = useLocation();
 
+  // Show loading spinner while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4"></div>
+          <div className="spinner mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  // Check if authentication is required
+  if (requireAuth && !isAuthenticated) {
+    // Redirect to login page, preserving the attempted location
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requireAdmin && !isAdmin) {
-    return <Navigate to="/app/dashboard" replace />;
+  // Check if admin access is required
+  if (requireAdmin && (!isAuthenticated || !isAdmin)) {
+    // Redirect to dashboard or unauthorized page
+    return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
   }
 
+  // If all checks pass, render the protected content
   return <>{children}</>;
-}
+};
+
+export default ProtectedRoute;

@@ -6,7 +6,7 @@ import {
   DocumentTextIcon, 
   EyeIcon,
   CalendarDaysIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   PlusIcon,
   ArrowRightIcon,
   CheckCircleIcon,
@@ -198,7 +198,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-600">
-            <TrendingUpIcon className="h-4 w-4 mr-1" />
+            <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
             <span>+{stats.todayApplications} today</span>
           </div>
         </div>

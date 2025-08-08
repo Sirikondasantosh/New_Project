@@ -6,15 +6,15 @@ import {
   DocumentTextIcon,
   CurrencyDollarIcon,
   ChartBarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
   EyeIcon,
   CogIcon,
   ServerIcon,
-  DatabaseIcon
+  CircleStackIcon
 } from '@heroicons/react/24/outline';
 import { useToast } from '../../contexts/ToastContext';
 import { api } from '../../services/api';
@@ -159,8 +159,8 @@ export default function AdminDashboard() {
   };
 
   const getGrowthIcon = (growth: number) => {
-    if (growth > 0) return <TrendingUpIcon className="h-4 w-4" />;
-    if (growth < 0) return <TrendingDownIcon className="h-4 w-4" />;
+    if (growth > 0) return <ArrowTrendingUpIcon className="h-4 w-4" />;
+    if (growth < 0) return <ArrowTrendingDownIcon className="h-4 w-4" />;
     return null;
   };
 
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center">
-                    <DatabaseIcon className="h-5 w-5 text-gray-400 mr-3" />
+                    <CircleStackIcon className="h-5 w-5 text-gray-400 mr-3" />
                     <span className="text-sm font-medium text-gray-900">Database Size</span>
                   </div>
                   <span className="text-sm font-semibold text-gray-900">{stats.system.dbSize}</span>
